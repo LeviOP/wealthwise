@@ -1,0 +1,23 @@
+{
+  "name": "finance-tracking",
+  "version": "1.0.0",
+  "description": "Finance tracking MERN stack application",
+  "scripts": {
+    "seed": "cd server && pnpm seed",
+    "server:dev": "cd server && pnpm dev",
+    "server:build": "cd server && pnpm build",
+    "server:start": "cd server && pnpm start",
+    "client:dev": "cd client && pnpm dev",
+    "client:build": "cd client && pnpm build",
+    "dev": "concurrently \"pnpm server:dev\" \"pnpm client:dev\"",
+    "build": "concurrently \"pnpm server:build\" \"pnpm client:build\"",
+    "start": "concurrently \"pnpm server:start\" \"pnpm client:dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.5.2",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
