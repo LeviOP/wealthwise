@@ -1,10 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './apollo/client';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { Dashboard } from './components/Dashboard';
+import { CategoriesPage } from './components/CategoriesPage';
+import { BudgetsPage } from './components/BudgetsPage';
 import {
   AppBar,
   Toolbar,
@@ -12,6 +14,7 @@ import {
   Container,
   Box,
   Button,
+  ButtonGroup,
 } from '@mui/material';
 
 // Protected Route component
@@ -40,6 +43,17 @@ function App() {
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 WealthWise
               </Typography>
+              <ButtonGroup variant="text" color="inherit" sx={{ mr: 2 }}>
+                <Button component={Link} to="/dashboard" color="inherit">
+                  Dashboard
+                </Button>
+                <Button component={Link} to="/categories" color="inherit">
+                  Categories
+                </Button>
+                <Button component={Link} to="/budgets" color="inherit">
+                  Budgets
+                </Button>
+              </ButtonGroup>
               <Button color="inherit" onClick={handleLogout}>
                 Logout
               </Button>
@@ -55,6 +69,22 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/categories"
+                element={
+                  <ProtectedRoute>
+                    <CategoriesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/budgets"
+                element={
+                  <ProtectedRoute>
+                    <BudgetsPage />
                   </ProtectedRoute>
                 }
               />
