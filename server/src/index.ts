@@ -1,6 +1,5 @@
 import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -13,6 +12,7 @@ import { categoryResolvers } from './resolvers/category';
 import { budgetTypeDefs } from './schema/budget';
 import { budgetResolvers } from './resolvers/budget';
 import { authMiddleware } from './middleware/auth';
+import { connectDB } from './config/database';
 
 dotenv.config();
 
@@ -74,7 +74,7 @@ async function startServer(): Promise<void> {
 
   // Connect to MongoDB
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/finance-tracking');
+    await connectDB();
     console.log('Connected to MongoDB');
   } catch (error) {
     console.error('MongoDB connection error:', error);

@@ -38,7 +38,7 @@ function App() {
           <AppBar position="static">
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Finance Tracker
+                WealthWise
               </Typography>
               <Button color="inherit" onClick={handleLogout}>
                 Logout

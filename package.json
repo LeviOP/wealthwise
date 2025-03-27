@@ -1,7 +1,7 @@
 {
-  "name": "finance-tracking",
-  "version": "1.0.0",
-  "description": "Finance tracking MERN stack application",
+  "name": "wealthwise",
+  "version": "0.1.0",
+  "description": "WealthWise - Personal Finance Management Application",
   "scripts": {
     "seed": "cd server && pnpm seed",
     "server:dev": "cd server && pnpm dev",
