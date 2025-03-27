@@ -13,8 +13,6 @@ import {
 import { TransactionList } from './TransactionList';
 import { CategorySummary } from './CategorySummary';
 import { AddTransaction } from './AddTransaction';
-import { CategoryManager } from './CategoryManager';
-import { BudgetManager } from './BudgetManager';
 
 const GET_TRANSACTIONS = gql`
   query GetTransactions {
@@ -111,16 +109,6 @@ export const Dashboard: React.FC = () => {
               ${(totals.income - totals.expense).toFixed(2)}
             </Typography>
           </Paper>
-        </Grid>
-
-        {/* Category Management */}
-        <Grid item xs={12}>
-          <CategoryManager categories={categories} onCategoryUpdated={refetch} />
-        </Grid>
-
-        {/* Budget Management */}
-        <Grid item xs={12}>
-          <BudgetManager />
         </Grid>
 
         {/* Add Transaction Form */}

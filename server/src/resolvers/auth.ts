@@ -51,27 +51,34 @@ export const authResolvers = {
 
     register: async (_: unknown, { email, password, firstName, lastName }: RegisterInput) => {
       const existingUser = await User.findOne({ email });
-      if (existingUser) throw new Error('User already exists');
+      if (existingUser) throw new Error('A user with this email already exists');
 
-      const user = new User({
-        email,
-        password,
-        firstName,
-        lastName,
-      });
+      try {
+        const user = new User({
+          email,
+          password,
+          firstName,
+          lastName,
+        });
 
-      await user.save();
+        await user.save();
 
-      // Create default categories for the new user
-      const defaultCategories = DEFAULT_CATEGORIES.map(category => ({
-        ...category,
-        user: user._id,
-      }));
+        // Create default categories for the new user
+        const defaultCategories = DEFAULT_CATEGORIES.map(category => ({
+          ...category,
+          user: user._id,
+        }));
 
-      await Category.insertMany(defaultCategories);
+        await Category.insertMany(defaultCategories);
 
-      const token = generateToken(user);
-      return { token, user };
+        const token = generateToken(user);
+        return { token, user };
+      } catch (error) {
+        if (error instanceof Error && error.message.includes('password')) {
+          throw new Error('Password must be at least 6 characters long');
+        }
+        throw error;
+      }
     },
   },
 }; 
