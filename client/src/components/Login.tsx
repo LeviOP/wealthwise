@@ -11,7 +11,7 @@ import {
   Alert,
   Link,
 } from '@mui/material';
-import { useAuth } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 
 const LOGIN_MUTATION = gql`
   mutation Login($email: String!, $password: String!) {

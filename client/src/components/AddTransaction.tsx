@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { gql } from '@apollo/client';
 import {
   Paper,
@@ -24,25 +24,6 @@ const CREATE_TRANSACTION = gql`
         name
         type
       }
-    }
-  }
-`;
-
-const GET_BUDGETS = gql`
-  query GetBudgets {
-    budgets {
-      id
-      category {
-        id
-        name
-        type
-      }
-      amount
-      period
-      startDate
-      spent
-      remaining
-      percentageUsed
     }
   }
 `;
