@@ -4,7 +4,7 @@
     "description": "WealthWise - Personal Finance Management Application",
     "type": "module",
     "scripts": {
-        "install": "pnpm install && cd server && pnpm install && cd ../client && pnpm install",
+        "install": "cd server && pnpm install && cd ../client && pnpm install",
         "seed": "cd server && pnpm seed",
         "server:dev": "cd server && pnpm dev",
         "server:build": "cd server && pnpm build",
