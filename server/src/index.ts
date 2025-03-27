@@ -3,6 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { authTypeDefs } from './schema/auth';
 import { authResolvers } from './resolvers/auth';
 import { transactionTypeDefs } from './schema/transaction';
@@ -59,6 +60,17 @@ async function startServer(): Promise<void> {
 
   await server.start();
   server.applyMiddleware({ app });
+
+  // Serve static files from the client build directory
+  const clientBuildPath = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientBuildPath));
+
+  // Handle client-side routing by serving index.html for all non-API routes
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/graphql')) {
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    }
+  });
 
   // Connect to MongoDB
   try {

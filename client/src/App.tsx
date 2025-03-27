@@ -5,9 +5,6 @@ import { client } from './apollo/client';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { Dashboard } from './components/Dashboard';
-import { AddTransaction } from './components/AddTransaction';
-import { TransactionList } from './components/TransactionList';
-import { CategorySummary } from './components/CategorySummary';
 import {
   AppBar,
   Toolbar,

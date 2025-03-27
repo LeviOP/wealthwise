@@ -10,8 +10,8 @@
     "client:dev": "cd client && pnpm dev",
     "client:build": "cd client && pnpm build",
     "dev": "concurrently \"pnpm server:dev\" \"pnpm client:dev\"",
-    "build": "concurrently \"pnpm server:build\" \"pnpm client:build\"",
-    "start": "concurrently \"pnpm server:start\" \"pnpm client:dev\""
+    "build": "pnpm server:build && pnpm client:build",
+    "start": "pnpm server:start"
   },
   "keywords": [],
   "author": "",
