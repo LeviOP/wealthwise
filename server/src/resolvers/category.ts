@@ -1,63 +1,60 @@
+import { ICategory } from '../models/Category';
+import { IContext } from '../middleware/auth';
 import { Category } from '../models/Category';
-import { IContext } from '../types/context';
+
+interface CategoryInput {
+  name: string;
+  type: 'income' | 'expense';
+}
 
 export const categoryResolvers = {
   Category: {
-    id: (parent: any) => parent._id.toString(),
+    id: (parent: ICategory) => (parent._id as unknown as { toString: () => string }).toString(),
+    name: (parent: ICategory) => parent.name,
+    type: (parent: ICategory) => parent.type,
+    createdAt: (parent: ICategory) => parent.createdAt.toISOString(),
+    updatedAt: (parent: ICategory) => parent.updatedAt.toISOString(),
   },
 
   Query: {
-    categories: async (_: any, __: any, context: IContext) => {
+    categories: async (_: unknown, __: unknown, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      return Category.find({ user: context.user._id }).sort({ name: 1 });
+      return Category.find({ user: context.user._id });
     },
 
-    category: async (_: any, { id }: { id: string }, context: IContext) => {
+    category: async (_: unknown, { id }: { id: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
       return Category.findOne({ _id: id, user: context.user._id });
     },
 
-    categoriesByType: async (_: any, { type }: { type: string }, context: IContext) => {
+    categoriesByType: async (_: unknown, { type }: { type: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      return Category.find({ user: context.user._id, type }).sort({ name: 1 });
+      return Category.find({ user: context.user._id, type });
     },
   },
 
   Mutation: {
-    createCategory: async (_: any, { input }: { input: any }, context: IContext) => {
+    createCategory: async (_: unknown, { input }: { input: CategoryInput }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
       const category = new Category({
         ...input,
-        user: context.user._id
+        user: context.user._id,
       });
-
       return category.save();
     },
 
-    updateCategory: async (_: any, { id, input }: { id: string; input: any }, context: IContext) => {
+    updateCategory: async (_: unknown, { id, input }: { id: string; input: CategoryInput }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-
-      const category = await Category.findOneAndUpdate(
+      return Category.findOneAndUpdate(
         { _id: id, user: context.user._id },
         input,
         { new: true }
       );
-
-      if (!category) throw new Error('Category not found');
-
-      return category;
     },
 
-    deleteCategory: async (_: any, { id }: { id: string }, context: IContext) => {
+    deleteCategory: async (_: unknown, { id }: { id: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      const result = await Category.findOneAndDelete({
-        _id: id,
-        user: context.user._id
-      });
-
-      return !!result;
+      return Category.findOneAndDelete({ _id: id, user: context.user._id });
     },
   },
 }; 

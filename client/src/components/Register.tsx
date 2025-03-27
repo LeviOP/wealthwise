@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, ApolloError } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 
 const REGISTER_MUTATION = gql`
@@ -38,8 +38,12 @@ export const Register: React.FC = () => {
       
       // Redirect to dashboard or home page
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during registration');
+    } catch (err: unknown) {
+      if (err instanceof ApolloError) {
+        setError(err.message || 'An error occurred during registration');
+      } else {
+        setError('An unexpected error occurred during registration');
+      }
     }
   };
 

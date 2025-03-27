@@ -13,6 +13,10 @@ export const authTypeDefs = gql`
     user: User!
   }
 
+  extend type Query {
+    me: User!
+  }
+
   extend type Mutation {
     login(email: String!, password: String!): AuthPayload!
     register(email: String!, password: String!, firstName: String!, lastName: String!): AuthPayload!

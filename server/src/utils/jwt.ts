@@ -1,25 +1,21 @@
 import jwt from 'jsonwebtoken';
 import { IUser } from '../models/User';
 
+interface JWTPayload {
+  userId: string;
+  email: string;
+}
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export const generateToken = (user: IUser): string => {
   return jwt.sign(
-    { 
-      id: user._id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName
-    },
+    { userId: user._id, email: user.email },
     JWT_SECRET,
-    { expiresIn: '24h' }
+    { expiresIn: '7d' }
   );
 };
 
-export const verifyToken = (token: string): any => {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
-    throw new Error('Invalid token');
-  }
+export const verifyToken = (token: string): JWTPayload => {
+  return jwt.verify(token, JWT_SECRET) as JWTPayload;
 }; 

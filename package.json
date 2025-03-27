@@ -1,23 +1,34 @@
 {
-  "name": "wealthwise",
-  "version": "0.1.0",
-  "description": "WealthWise - Personal Finance Management Application",
-  "scripts": {
-    "seed": "cd server && pnpm seed",
-    "server:dev": "cd server && pnpm dev",
-    "server:build": "cd server && pnpm build",
-    "server:start": "cd server && pnpm start",
-    "client:dev": "cd client && pnpm dev",
-    "client:build": "cd client && pnpm build",
-    "dev": "concurrently \"pnpm server:dev\" \"pnpm client:dev\"",
-    "build": "pnpm server:build && pnpm client:build",
-    "start": "pnpm server:start"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.5.2",
-  "devDependencies": {
-    "concurrently": "^9.1.2"
-  }
+    "name": "wealthwise",
+    "version": "0.1.0",
+    "description": "WealthWise - Personal Finance Management Application",
+    "type": "module",
+    "scripts": {
+        "seed": "cd server && pnpm seed",
+        "server:dev": "cd server && pnpm dev",
+        "server:build": "cd server && pnpm build",
+        "server:start": "cd server && pnpm start",
+        "server:lint": "cd server && pnpm lint",
+        "client:dev": "cd client && pnpm dev",
+        "client:build": "cd client && pnpm build",
+        "client:lint": "cd client && pnpm lint",
+        "dev": "concurrently \"pnpm server:dev\" \"pnpm client:dev\"",
+        "build": "pnpm server:build && pnpm client:build",
+        "start": "pnpm server:start",
+        "lint": "pnpm server:lint && pnpm client:lint"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "packageManager": "pnpm@10.5.2",
+    "devDependencies": {
+        "@eslint/js": "^9.23.0",
+        "@typescript-eslint/eslint-plugin": "^8.28.0",
+        "@typescript-eslint/parser": "^8.28.0",
+        "concurrently": "^9.1.2",
+        "eslint": "^9.23.0",
+        "eslint-plugin-jsx-a11y": "^6.10.2",
+        "eslint-plugin-react": "^7.37.4",
+        "eslint-plugin-react-hooks": "^5.2.0"
+    }
 }

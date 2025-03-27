@@ -1,7 +1,6 @@
-import { User } from '../models/User';
+import { User, IUser } from '../models/User';
 import { Category } from '../models/Category';
 import { generateToken } from '../utils/jwt';
-import { GraphQLError } from 'graphql';
 
 const DEFAULT_CATEGORIES = [
   // Income categories
@@ -23,43 +22,36 @@ const DEFAULT_CATEGORIES = [
   { name: 'Other Expenses', type: 'expense' },
 ];
 
+interface RegisterInput {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
 export const authResolvers = {
+  Query: {
+    me: async (_: unknown, __: unknown, context: { user: IUser }) => {
+      if (!context.user) throw new Error('Not authenticated');
+      return User.findById(context.user._id);
+    },
+  },
+
   Mutation: {
-    login: async (_: any, { email, password }: { email: string; password: string }) => {
+    login: async (_: unknown, { email, password }: { email: string; password: string }) => {
       const user = await User.findOne({ email });
-      
-      if (!user || !(await user.comparePassword(password))) {
-        throw new GraphQLError('Invalid email or password', {
-          extensions: { code: 'INVALID_CREDENTIALS' },
-        });
-      }
+      if (!user) throw new Error('User not found');
+
+      const isValid = await user.comparePassword(password);
+      if (!isValid) throw new Error('Invalid password');
 
       const token = generateToken(user);
-
-      return {
-        token,
-        user: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
-      };
+      return { token, user };
     },
 
-    register: async (_: any, { email, password, firstName, lastName }: {
-      email: string;
-      password: string;
-      firstName: string;
-      lastName: string;
-    }) => {
+    register: async (_: unknown, { email, password, firstName, lastName }: RegisterInput) => {
       const existingUser = await User.findOne({ email });
-      
-      if (existingUser) {
-        throw new GraphQLError('Email already registered', {
-          extensions: { code: 'USER_EXISTS' },
-        });
-      }
+      if (existingUser) throw new Error('User already exists');
 
       const user = new User({
         email,
@@ -79,16 +71,7 @@ export const authResolvers = {
       await Category.insertMany(defaultCategories);
 
       const token = generateToken(user);
-
-      return {
-        token,
-        user: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        },
-      };
+      return { token, user };
     },
   },
 }; 

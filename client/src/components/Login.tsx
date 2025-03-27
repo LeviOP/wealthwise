@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation, ApolloError } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 
 const LOGIN_MUTATION = gql`
@@ -36,8 +36,12 @@ export const Login: React.FC = () => {
       
       // Redirect to dashboard or home page
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during login');
+    } catch (err: unknown) {
+      if (err instanceof ApolloError) {
+        setError(err.message || 'An error occurred during login');
+      } else {
+        setError('An unexpected error occurred during login');
+      }
     }
   };
 

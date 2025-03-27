@@ -1,208 +1,74 @@
+import { IBudget } from '../models/Budget';
+import { IContext } from '../middleware/auth';
 import { Budget } from '../models/Budget';
-import { Category } from '../models/Category';
-import { Transaction } from '../models/Transaction';
-import { IContext } from '../types/context';
+import { Types } from 'mongoose';
 
-const calculateBudgetProgress = async (
-  budget: any,
-  startDate: Date,
-  endDate: Date
-) => {
-  const transactions = await Transaction.find({
-    category: budget.category,
-    date: { $gte: startDate, $lte: endDate },
-    type: 'expense',
-  });
-
-  const spent = transactions.reduce((sum, t) => sum + t.amount, 0);
-  const remaining = budget.amount - spent;
-  const percentageUsed = (spent / budget.amount) * 100;
-
-  return {
-    spent,
-    remaining,
-    percentageUsed,
-  };
-};
+interface BudgetInput {
+  category: string;
+  amount: number;
+  period: 'monthly' | 'yearly';
+  startDate: string;
+}
 
 export const budgetResolvers = {
+  Budget: {
+    id: (parent: IBudget) => (parent._id as Types.ObjectId).toString(),
+    category: (parent: IBudget) => parent.category,
+    amount: (parent: IBudget) => parent.amount,
+    period: (parent: IBudget) => parent.period,
+    startDate: (parent: IBudget) => parent.startDate.toISOString(),
+    createdAt: (parent: IBudget) => parent.createdAt.toISOString(),
+    updatedAt: (parent: IBudget) => parent.updatedAt.toISOString(),
+  },
+
   Query: {
-    budgets: async (_: any, __: any, context: IContext) => {
+    budgets: async (_: unknown, __: unknown, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      const budgets = await Budget.find({ user: context.user._id })
-        .populate('category');
-
-      // Calculate progress for each budget
-      const budgetsWithProgress = await Promise.all(
-        budgets.map(async (budget) => {
-          const startDate = new Date(budget.startDate);
-          const endDate = new Date();
-          
-          if (budget.period === 'monthly') {
-            startDate.setDate(1); // First day of the month
-            endDate.setDate(1);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0); // Last day of the month
-          } else {
-            startDate.setMonth(0, 1); // First day of the year
-            endDate.setMonth(11, 31); // Last day of the year
-          }
-
-          const progress = await calculateBudgetProgress(budget, startDate, endDate);
-          return {
-            ...budget.toObject(),
-            ...progress,
-          };
-        })
-      );
-
-      return budgetsWithProgress;
+      return Budget.find({ user: context.user._id }).sort({ startDate: -1 });
     },
 
-    budget: async (_: any, { id }: { id: string }, context: IContext) => {
+    budget: async (_: unknown, { id }: { id: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      const budget = await Budget.findOne({
-        _id: id,
-        user: context.user._id,
-      }).populate('category');
-
-      if (!budget) return null;
-
-      const startDate = new Date(budget.startDate);
-      const endDate = new Date();
-      
-      if (budget.period === 'monthly') {
-        startDate.setDate(1);
-        endDate.setDate(1);
-        endDate.setMonth(endDate.getMonth() + 1);
-        endDate.setDate(0);
-      } else {
-        startDate.setMonth(0, 1);
-        endDate.setMonth(11, 31);
-      }
-
-      const progress = await calculateBudgetProgress(budget, startDate, endDate);
-      return {
-        ...budget.toObject(),
-        ...progress,
-      };
+      return Budget.findOne({ _id: id, user: context.user._id });
     },
 
-    budgetsByPeriod: async (_: any, { period }: { period: string }, context: IContext) => {
+    budgetsByPeriod: async (_: unknown, { period }: { period: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      const budgets = await Budget.find({
-        user: context.user._id,
-        period,
-      }).populate('category');
-
-      return Promise.all(
-        budgets.map(async (budget) => {
-          const startDate = new Date(budget.startDate);
-          const endDate = new Date();
-          
-          if (budget.period === 'monthly') {
-            startDate.setDate(1);
-            endDate.setDate(1);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0);
-          } else {
-            startDate.setMonth(0, 1);
-            endDate.setMonth(11, 31);
-          }
-
-          const progress = await calculateBudgetProgress(budget, startDate, endDate);
-          return {
-            ...budget.toObject(),
-            ...progress,
-          };
-        })
-      );
+      return Budget.find({ user: context.user._id, period }).sort({ startDate: -1 });
     },
 
-    budgetsByCategory: async (_: any, { categoryId }: { categoryId: string }, context: IContext) => {
+    budgetsByCategory: async (_: unknown, { categoryId }: { categoryId: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      const budgets = await Budget.find({
-        user: context.user._id,
-        category: categoryId,
-      }).populate('category');
-
-      return Promise.all(
-        budgets.map(async (budget) => {
-          const startDate = new Date(budget.startDate);
-          const endDate = new Date();
-          
-          if (budget.period === 'monthly') {
-            startDate.setDate(1);
-            endDate.setDate(1);
-            endDate.setMonth(endDate.getMonth() + 1);
-            endDate.setDate(0);
-          } else {
-            startDate.setMonth(0, 1);
-            endDate.setMonth(11, 31);
-          }
-
-          const progress = await calculateBudgetProgress(budget, startDate, endDate);
-          return {
-            ...budget.toObject(),
-            ...progress,
-          };
-        })
-      );
+      return Budget.find({ user: context.user._id, category: categoryId }).sort({ startDate: -1 });
     },
   },
 
   Mutation: {
-    createBudget: async (_: any, { input }: { input: any }, context: IContext) => {
+    createBudget: async (_: unknown, { input }: { input: BudgetInput }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      // Verify category exists and belongs to user
-      const category = await Category.findOne({
-        _id: input.categoryId,
-        user: context.user._id,
-      });
-      
-      if (!category) throw new Error('Category not found');
-
       const budget = new Budget({
         ...input,
         user: context.user._id,
-        startDate: input.startDate ? new Date(input.startDate) : new Date(),
+        startDate: new Date(input.startDate),
       });
-
       return budget.save();
     },
 
-    updateBudget: async (_: any, { id, input }: { id: string; input: any }, context: IContext) => {
+    updateBudget: async (_: unknown, { id, input }: { id: string; input: BudgetInput }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-
-      const budget = await Budget.findOne({
-        _id: id,
-        user: context.user._id,
-      });
-
-      if (!budget) throw new Error('Budget not found');
-
-      Object.assign(budget, {
-        ...input,
-        startDate: input.startDate ? new Date(input.startDate) : budget.startDate,
-      });
-
-      return budget.save();
+      return Budget.findOneAndUpdate(
+        { _id: id, user: context.user._id },
+        {
+          ...input,
+          startDate: new Date(input.startDate),
+        },
+        { new: true }
+      );
     },
 
-    deleteBudget: async (_: any, { id }: { id: string }, context: IContext) => {
+    deleteBudget: async (_: unknown, { id }: { id: string }, context: IContext) => {
       if (!context.user) throw new Error('Not authenticated');
-      
-      const result = await Budget.findOneAndDelete({
-        _id: id,
-        user: context.user._id,
-      });
-
-      return !!result;
+      return Budget.findOneAndDelete({ _id: id, user: context.user._id });
     },
   },
 }; 

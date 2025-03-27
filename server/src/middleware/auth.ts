@@ -1,13 +1,13 @@
 import { Request } from 'express';
 import { verifyToken } from '../utils/jwt';
-import { User } from '../models/User';
+import { User, IUser } from '../models/User';
 
-export interface Context {
+export interface IContext {
   req: Request;
-  user?: any;
+  user?: IUser;
 }
 
-export const authMiddleware = async ({ req }: { req: Request }): Promise<Context> => {
+export const authMiddleware = async ({ req }: { req: Request }): Promise<IContext> => {
   const authHeader = req.headers.authorization;
   
   if (!authHeader) {
@@ -19,7 +19,7 @@ export const authMiddleware = async ({ req }: { req: Request }): Promise<Context
     const decoded = verifyToken(token);
     
     // Verify that the user still exists in the database
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.userId);
     if (!user) {
       return { req };
     }
