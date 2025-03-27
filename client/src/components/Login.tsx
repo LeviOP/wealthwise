@@ -11,6 +11,7 @@ import {
   Alert,
   Link,
 } from '@mui/material';
+import { useAuth } from '../contexts/AuthContext';
 
 const LOGIN_MUTATION = gql`
   mutation Login($email: String!, $password: String!) {
@@ -31,16 +32,17 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const [login] = useMutation(LOGIN_MUTATION);
+  const { login } = useAuth();
+  const [loginMutation] = useMutation(LOGIN_MUTATION);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { data } = await login({
+      const { data } = await loginMutation({
         variables: { email, password },
       });
       
-      localStorage.setItem('token', data.login.token);
+      login(data.login.token);
       localStorage.setItem('user', JSON.stringify(data.login.user));
       navigate('/dashboard');
     } catch (err: unknown) {

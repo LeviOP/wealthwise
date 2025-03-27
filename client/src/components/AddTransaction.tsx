@@ -51,7 +51,9 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
     date: new Date().toISOString().split('T')[0],
   });
   const [error, setError] = useState<string | null>(null);
-  const [createTransaction] = useMutation(CREATE_TRANSACTION);
+  const [createTransaction] = useMutation(CREATE_TRANSACTION, {
+    refetchQueries: ['GetBudgets'],
+  });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -96,7 +98,7 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
   return (
     <Paper sx={{ p: 2, mb: 3 }}>
       <Typography variant="h6" gutterBottom>
-        Add New Transaction
+        Add Transaction
       </Typography>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -104,7 +106,7 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
         </Alert>
       )}
       <form onSubmit={handleSubmit}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <TextField
             required
             label="Amount"
@@ -113,6 +115,7 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
             value={formData.amount}
             onChange={handleChange}
             inputProps={{ min: 0, step: 0.01 }}
+            sx={{ flex: 1 }}
           />
           <TextField
             required
@@ -121,17 +124,11 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
             name="type"
             value={formData.type}
             onChange={handleChange}
+            sx={{ flex: 1 }}
           >
             <MenuItem value="income">Income</MenuItem>
             <MenuItem value="expense">Expense</MenuItem>
           </TextField>
-          <TextField
-            required
-            label="Description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-          />
           <TextField
             required
             select
@@ -139,6 +136,7 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
             name="categoryId"
             value={formData.categoryId}
             onChange={handleChange}
+            sx={{ flex: 2 }}
           >
             {categories
               .filter((category) => category.type === formData.type)
@@ -150,18 +148,27 @@ export const AddTransaction: React.FC<AddTransactionProps> = ({
           </TextField>
           <TextField
             required
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            sx={{ flex: 2 }}
+          />
+          <TextField
+            required
             label="Date"
             type="date"
             name="date"
             value={formData.date}
             onChange={handleChange}
             InputLabelProps={{ shrink: true }}
+            sx={{ flex: 1 }}
           />
           <Button
             type="submit"
             variant="contained"
             color="primary"
-            disabled={!formData.amount || !formData.categoryId}
+            disabled={!formData.amount || !formData.categoryId || !formData.description}
           >
             Add Transaction
           </Button>
