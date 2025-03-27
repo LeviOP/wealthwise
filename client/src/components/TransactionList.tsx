@@ -77,8 +77,12 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   onTransactionUpdated,
 }) => {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-  const [updateTransaction] = useMutation(UPDATE_TRANSACTION);
-  const [deleteTransaction] = useMutation(DELETE_TRANSACTION);
+  const [updateTransaction] = useMutation(UPDATE_TRANSACTION, {
+    refetchQueries: ['GetBudgets'],
+  });
+  const [deleteTransaction] = useMutation(DELETE_TRANSACTION, {
+    refetchQueries: ['GetBudgets'],
+  });
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction);
