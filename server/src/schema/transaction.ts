@@ -3,7 +3,7 @@ export const transactionTypeDefs = `#graphql
     id: ID!
     amount: Float!
     type: TransactionType!
-    category: Category!
+    category: Category
     description: String!
     date: String!
     createdAt: String!
@@ -41,6 +41,6 @@ export const transactionTypeDefs = `#graphql
   type Mutation {
     createTransaction(input: CreateTransactionInput!): Transaction!
     updateTransaction(id: ID!, input: UpdateTransactionInput!): Transaction!
-    deleteTransaction(id: ID!): Boolean!
+    deleteTransaction(id: ID!): Transaction!
   }
 `; 
