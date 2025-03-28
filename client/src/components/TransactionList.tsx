@@ -40,7 +40,18 @@ const UPDATE_TRANSACTION = gql`
 
 const DELETE_TRANSACTION = gql`
   mutation DeleteTransaction($id: ID!) {
-    deleteTransaction(id: $id)
+    deleteTransaction(id: $id) {
+      id
+      amount
+      type
+      description
+      date
+      category {
+        id
+        name
+        type
+      }
+    }
   }
 `;
 
@@ -51,10 +62,10 @@ interface Transaction {
   description: string;
   date: string;
   category: {
-    id: string;
-    name: string;
-    type: 'income' | 'expense';
-  };
+    id: string | null;
+    name: string | null;
+    type: 'income' | 'expense' | null;
+  } | null;
 }
 
 interface Category {
@@ -81,7 +92,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
     refetchQueries: ['GetBudgets'],
   });
   const [deleteTransaction] = useMutation(DELETE_TRANSACTION, {
-    refetchQueries: ['GetBudgets'],
+    refetchQueries: ['GetBudgets', 'GetTransactions'],
   });
 
   const handleEdit = (transaction: Transaction) => {
@@ -109,7 +120,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             amount: editingTransaction.amount,
             type: editingTransaction.type,
             description: editingTransaction.description,
-            categoryId: editingTransaction.category.id,
+            categoryId: editingTransaction.category?.id,
             date: editingTransaction.date,
           },
         },
@@ -122,7 +133,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   };
 
   const filteredTransactions = selectedCategory
-    ? transactions.filter((t) => t.category.id === selectedCategory)
+    ? transactions.filter((t) => t.category?.id === selectedCategory)
     : transactions;
 
   return (
@@ -146,7 +157,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <TableRow key={transaction.id}>
                 <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
-                <TableCell>{transaction.category.name}</TableCell>
+                <TableCell>{transaction.category?.name}</TableCell>
                 <TableCell
                   align="right"
                   sx={{
@@ -223,7 +234,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               fullWidth
               select
               label="Category"
-              value={editingTransaction?.category.id || ''}
+              value={editingTransaction?.category?.id || ''}
               onChange={(e) =>
                 setEditingTransaction((prev) =>
                   prev

@@ -1,10 +1,10 @@
 export const categoryTypeDefs = `#graphql
   type Category {
-    id: ID!
-    name: String!
-    type: CategoryType!
-    createdAt: String!
-    updatedAt: String!
+    id: ID
+    name: String
+    type: CategoryType
+    createdAt: String
+    updatedAt: String
   }
 
   enum CategoryType {
